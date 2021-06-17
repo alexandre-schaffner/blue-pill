@@ -12,9 +12,9 @@ def convert_to_ascii(px, th):
         return (' ')
     gray_ramp = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
     char = int(px / (256 / 70))
-    if char >= 70:
-        char = 69
-    return gray_ramp[char]
+    if char > 70:
+        char = 70
+    return gray_ramp[char - 1]
 #=======================================================================================#
 
 #===INIT WEBCAM CAPTURE===#
@@ -60,6 +60,6 @@ while True:
 #===END===#
 cap.release()
 scr.keypad(False)
-curses.endwin()
-curses.nocbreak()
 curses.echo()
+curses.nocbreak()
+curses.endwin()
