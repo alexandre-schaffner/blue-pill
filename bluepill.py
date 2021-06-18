@@ -20,7 +20,7 @@ def convert_to_ascii(coord, px, th, color): #coord is tupple (y, x)
 
 #===INIT WEBCAM CAPTURE===#
 cap = cv.VideoCapture(0);
-th = 95
+th = 70
 if not cap.isOpened():
     cap.open();
     if not cap.isOpened():
@@ -33,8 +33,7 @@ curses.start_color()
 curses.use_default_colors()
 for i in range(0, curses.COLORS):
     curses.init_pair(i + 1, i, -1)
-#curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
-color = 0
+color = 220
 height, width = scr.getmaxyx()
 scr.nodelay(True)
 scr.keypad(True)
@@ -52,21 +51,25 @@ while True:
         th -= 1
     elif c == curses.KEY_UP and th < 255:
         th += 1
-    elif c == ord('a') and color > 0:
+    elif c == curses.KEY_LEFT and color > 0:
         color -= 1
-    elif c == ord('p') and color < 255:
+    elif c == curses.KEY_RIGHT and color < 255:
         color += 1
     isRead, frame = cap.read()
     if not isRead:
         print("Can't receive frame (stream end ?). Exiting...")
         break
+    frame = cv.flip(frame, 1)
     frame = cv.resize(frame, (width, height), interpolation = cv.INTER_AREA)
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     scr.move(0, 0)
     for i_x in range(width - 1):
         for i_y in range(height - 1):
             convert_to_ascii((i_y, i_x), gray.item(i_y, i_x), th, color)
-    scr.addstr(0, 0, str(th))
+    scr.addstr(0, 0, "treshhold ")
+    scr.addstr(1, 0, str(th) + "        ")
+    scr.addstr(0, width - 7, " color ")
+    scr.addstr(1, width - 7, "   " + str(color))
     scr.refresh();
 
 #===END===#
