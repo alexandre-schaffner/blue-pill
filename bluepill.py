@@ -7,10 +7,10 @@ import curses
 
 
 #===CONVERT GRAYSCALE TO ASCII===#
-def convert_to_ascii(coord, px, th, color): #coord is tupple (y, x)
+def convert_to_ascii(coord, px, lo_th, hi_th, color): #coord is tupple (y, x)
     char = int(px / (256 / 70))
     gray_ramp = " .`:,;'_^\"\></-!~=)(|j?}{ ][ti+l7v1%yrfcJ32uIC$zwo96sngaT5qpkYVOL40&mG8*xhedbZUSAQPFDXWK#RNEHBM@"
-    if px < th or px > (255 - th):
+    if px < lo_th or px > (255 - hi_th):
         scr.addch(coord[0], coord[1], ' ')
     elif char > 69:
         scr.addch(coord[0], coord[1], '@', curses.color_pair(color + char))
@@ -20,7 +20,8 @@ def convert_to_ascii(coord, px, th, color): #coord is tupple (y, x)
 
 #===INIT WEBCAM CAPTURE===#
 cap = cv.VideoCapture(0);
-th = 70
+lo_th = 70
+hi_th = 70
 if not cap.isOpened():
     cap.open();
     if not cap.isOpened():
@@ -45,15 +46,19 @@ scr.clear()
 #===MAIN LOOP===#
 while True:
     c = scr.getch()
-    if c == ord('q'):
+    if c == 27:
         break
-    elif c == curses.KEY_DOWN and th > 0:
-        th -= 1
-    elif c == curses.KEY_UP and th < 255:
-        th += 1
-    elif c == curses.KEY_LEFT and color > 0:
+    elif c == ord('q') and lo_th > 0:
+        lo_th -= 1
+    elif c == ord('d') and lo_th < 255:
+        lo_th += 1
+    elif c == ord('z') and hi_th < 255:
+        hi_th += 1
+    elif c == ord('s') and hi_th > 0:
+        hi_th -= 1
+    elif c == ord('a') and color > 0:
         color -= 1
-    elif c == curses.KEY_RIGHT and color < 255:
+    elif c == ord('e') and color < 255:
         color += 1
     isRead, frame = cap.read()
     if not isRead:
@@ -65,9 +70,10 @@ while True:
     scr.move(0, 0)
     for i_x in range(width - 1):
         for i_y in range(height - 1):
-            convert_to_ascii((i_y, i_x), gray.item(i_y, i_x), th, color)
+            convert_to_ascii((i_y, i_x), gray.item(i_y, i_x), lo_th, hi_th, color)
     scr.addstr(0, 0, "treshhold ")
-    scr.addstr(1, 0, str(th) + "        ")
+    scr.addstr(1, 0, "lo_th: " + str(lo_th) + " ")
+    scr.addstr(2, 0, "hi_th: " + str(hi_th) + " ")
     scr.addstr(0, width - 7, " color ")
     scr.addstr(1, width - 7, "   " + str(color))
     scr.refresh();
