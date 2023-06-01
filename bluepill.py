@@ -7,6 +7,7 @@ from Camera import Camera
 from ui import print_keys, print_params
 
 
+# convert pixel light intensity to ascii character
 def convert_to_ascii(px: int, camera: Camera) -> str:
     char = int(px / (256 / 70))
     gray_ramp = " .'`^\",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
@@ -19,15 +20,16 @@ def convert_to_ascii(px: int, camera: Camera) -> str:
         return gray_ramp[char]
 
 
+# handle keypresses
 def handle_keys(screen: Screen, camera: Camera) -> None:
     c: str = screen.display.getch()
 
     if c == ord(' '):
         exit()
     elif c == ord('a') and camera.lo_th > 0:
-        return camera.decrease_color()
+        return camera.decrease_lo_th()
     elif c == ord('d') and camera.lo_th < 255:
-        return camera.increase_color()
+        return camera.increase_lo_th()
     elif c == ord('w') and camera.hi_th < 255:
         return camera.increase_hi_th()
     elif c == ord('s') and camera.hi_th > 0:
@@ -38,6 +40,7 @@ def handle_keys(screen: Screen, camera: Camera) -> None:
         return camera.increase_color()
 
 
+# create ascii frame from gray frame
 def create_ascii_frame(camera: Camera, screen: Screen) -> list[list[str]]:
     gray_frame = camera.get_gray_frame(screen.width, screen.height)
     ascii_frame: list[list[str]] = [[] for i in range(gray_frame.shape[0])]
